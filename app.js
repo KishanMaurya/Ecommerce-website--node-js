@@ -3,6 +3,10 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var session = require('express-session')
+var mysql = require('mysql');
+var connection = require('./database/db');
+var bodyParser = require('body-parser')
 
 var indexRouter = require('./routes/index');
 var aboutRouter = require('./routes/about');
@@ -44,9 +48,14 @@ var product_24Router = require('./routes/product-24');
 var product_25Router = require('./routes/product-25');
 var product_26Router = require('./routes/product-26');
 
+//Admin panel  routing start
 
-
+var loginAdminRouter = require('./routes/login');
+var dashboardRouter = require('./routes/dashboard');
+// var allProductRouter = require('./routes/viewProduct')
 var app = express();
+
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -57,6 +66,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+//start session
+app.use(session({
+    secret: 'secret',
+    resave: true,
+    saveUninitialized: true
+}));
+app.use(bodyParser.urlencoded({extended : true}));
+app.use(bodyParser.json());
 
 //this route works for the access the page (get this page by name)
 
@@ -102,6 +120,13 @@ app.use('/product-24' , product_24Router);
 app.use('/product-25' , product_25Router);
 app.use('/product-26' , product_26Router);
 
+// admin panel  using routing 
+
+app.use('/admin/login' , loginAdminRouter);
+app.use('/admin/dashboard' , dashboardRouter);
+// app.use('./admin/addProduct', allProductRouter);
+// app.use('./admin/allOrders', allOrders);
+// app.use('./admin/viewProduct', viewProduct);
 
 
 // catch 404 and forward to error handler
